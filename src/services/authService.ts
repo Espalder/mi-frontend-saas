@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = (process.env.REACT_APP_API_URL || 'https://mi-backend-saas.onrender.com/api') + '/auth/login-json';
+const API_URL = (process.env.REACT_APP_API_URL || 'https://mi-backend-saas.onrender.com') + '/api/auth/login-json';
 
 export interface LoginResponse {
   access_token: string;
