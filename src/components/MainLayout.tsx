@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, useTheme, ThemeProvider, createTheme, Avatar } from '@mui/material';
+import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, useTheme, ThemeProvider, createTheme, Avatar, ListItemButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
@@ -55,14 +55,21 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </Box>
       <List>
         {menuItems.map(item => (
-          <ListItem button key={item.text} selected={location.pathname === item.path} onClick={() => navigate(item.path)}>
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              selected={location.pathname === item.path}
+              onClick={() => navigate(item.path)}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
           </ListItem>
         ))}
-        <ListItem button onClick={handleLogout} sx={{ mt: 2 }}>
-          <ListItemIcon><LogoutIcon color="error" /></ListItemIcon>
-          <ListItemText primary="Cerrar sesión" />
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleLogout} sx={{ mt: 2 }}>
+            <ListItemIcon><LogoutIcon /></ListItemIcon>
+            <ListItemText primary="Cerrar sesión" />
+          </ListItemButton>
         </ListItem>
       </List>
     </Box>
