@@ -18,11 +18,17 @@ const DashboardPage: React.FC = () => {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" minHeight="100vh" justifyContent="center">
-      <Typography variant="h4" mb={2}>Bienvenido al Dashboard del SaaS</Typography>
-      <Typography variant="h6">Usuario: {user?.username}</Typography>
-      <Typography variant="body1">Rol: {user?.rol}</Typography>
-      <Typography variant="body2">Empresa ID: {user?.empresa_id}</Typography>
+    <Box display="flex" flexDirection="column" alignItems="center" minHeight="100vh" justifyContent="center" bgcolor={theme => theme.palette.background.default}>
+      <Typography variant="h4" mb={2} color="text.primary">Bienvenido al Dashboard del SaaS</Typography>
+      {user ? (
+        <>
+          <Typography variant="h6" color="text.primary">Usuario: {user?.username}</Typography>
+          <Typography variant="body1" color="text.primary">Rol: {user?.rol}</Typography>
+          <Typography variant="body2" color="text.secondary">Empresa ID: {user?.empresa_id}</Typography>
+        </>
+      ) : (
+        <Typography variant="body1" color="error">No se pudo cargar el usuario</Typography>
+      )}
     </Box>
   );
 };

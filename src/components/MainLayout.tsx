@@ -50,8 +50,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const drawer = (
     <Box>
       <Box display="flex" flexDirection="column" alignItems="center" p={2}>
-        <Avatar src={process.env.PUBLIC_URL + '/logo_empresa.png'} alt="Logo Empresa" sx={{ width: 64, height: 64, mb: 1 }} />
-        <Typography variant="h6" fontWeight="bold">Mi Empresa</Typography>
+        <Avatar src={process.env.PUBLIC_URL + '/logo_empresa.png'} alt="Logo Empresa" sx={{ width: 64, height: 64, mb: 2, bgcolor: theme.palette.background.paper, boxShadow: 2 }} />
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: theme.palette.text.primary }}>Mi Empresa</Typography>
       </Box>
       <List>
         {menuItems.map(item => (
