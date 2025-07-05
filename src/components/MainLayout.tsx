@@ -10,7 +10,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { removeToken } from '../services/authService';
-import logo from '../assets/logo_empresa.png';
+// import logo from '../assets/logo_empresa.png';
 
 const drawerWidth = 220;
 
@@ -50,7 +50,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const drawer = (
     <Box>
       <Box display="flex" flexDirection="column" alignItems="center" p={2}>
-        <Avatar src={logo} alt="Logo" sx={{ width: 64, height: 64, mb: 1 }} />
+        <Avatar src={process.env.PUBLIC_URL + '/logo_empresa.png'} alt="Logo Empresa" sx={{ width: 64, height: 64, mb: 1 }} />
         <Typography variant="h6" fontWeight="bold">Mi Empresa</Typography>
       </Box>
       <List>
