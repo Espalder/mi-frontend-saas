@@ -1,8 +1,12 @@
 import api from './api';
 
 export interface ReporteGeneral {
-  ventas_totales: number;
-  productos_mas_vendidos: { nombre: string; cantidad: number }[];
+  total_productos: number;
+  total_clientes: number;
+  total_ventas: number;
+  total_ventas_monto: number;
+  ventas_mes: number;
+  monto_mes: number;
 }
 
 export async function getReporteGeneral(): Promise<ReporteGeneral> {

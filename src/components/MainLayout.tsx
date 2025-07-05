@@ -26,7 +26,10 @@ const menuItems = [
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -87,7 +90,12 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
               Sistema de Gestión Empresarial
             </Typography>
-            <Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} color="default" />
+            <Switch checked={darkMode} onChange={() => {
+              setDarkMode((prev: boolean) => {
+                localStorage.setItem('darkMode', JSON.stringify(!prev));
+                return !prev;
+              });
+            }} color="default" />
           </Toolbar>
         </AppBar>
         <Drawer

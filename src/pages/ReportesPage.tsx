@@ -30,15 +30,12 @@ const ReportesPage: React.FC = () => {
           <Alert severity="error">{error}</Alert>
         ) : reporte ? (
           <Box>
-            <Typography variant="h6" mb={2} color="text.primary">Ventas totales: {reporte.ventas_totales}</Typography>
-            <Typography variant="subtitle1" color="text.secondary">Productos más vendidos:</Typography>
-            <List>
-              {reporte.productos_mas_vendidos.map((prod, idx) => (
-                <ListItem key={idx}>
-                  <ListItemText primary={`${prod.nombre} (${prod.cantidad})`} />
-                </ListItem>
-              ))}
-            </List>
+            <Typography variant="h6" mb={2} color="text.primary">Ventas totales: {reporte.total_ventas ?? 0}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">Total productos: {reporte.total_productos ?? 0}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">Total clientes: {reporte.total_clientes ?? 0}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">Monto total ventas: ${reporte.total_ventas_monto ?? 0}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">Ventas este mes: {reporte.ventas_mes ?? 0}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">Monto ventas este mes: ${reporte.monto_mes ?? 0}</Typography>
           </Box>
         ) : (
           <Alert severity="info">No hay reportes disponibles.</Alert>
