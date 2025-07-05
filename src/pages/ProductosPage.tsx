@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Typography, Paper, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import { getProductos, Producto } from '../services/productosService';
+import { getProductos, Producto, createProducto } from '../services/productosService';
 import { useTheme } from '@mui/material/styles';
 
 const ProductosPage: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    codigo: '',
+    nombre: '',
+    descripcion: '',
+    precio: '',
+    stock: '',
+    categoria_nombre: ''
+  });
+  const [formError, setFormError] = useState('');
   const theme = useTheme();
 
   useEffect(() => {
@@ -16,6 +26,29 @@ const ProductosPage: React.FC = () => {
       .catch(() => setError('No se pudieron cargar los productos'))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleOpen = () => { setOpen(true); setFormError(''); };
+  const handleClose = () => setOpen(false);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  const handleSubmit = async () => {
+    try {
+      await createProducto({
+        ...form,
+        precio: parseFloat(form.precio),
+        stock: parseInt(form.stock)
+      });
+      setOpen(false);
+      setLoading(true);
+      getProductos()
+        .then(setProductos)
+        .catch(() => setError('No se pudieron cargar los productos'))
+        .finally(() => setLoading(false));
+    } catch (err: any) {
+      setFormError('Error al crear producto');
+    }
+  };
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" minHeight="80vh" bgcolor={theme => theme.palette.background.default} p={4}>
@@ -27,7 +60,23 @@ const ProductosPage: React.FC = () => {
         <Typography variant="body1" mb={2} color="text.secondary">
           Aquí podrás ver, agregar, editar y eliminar productos de tu empresa.
         </Typography>
-        <Button variant="contained" color="primary" sx={{ mb: 2 }}>Agregar producto</Button>
+        <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={handleOpen}>Agregar producto</Button>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Agregar producto</DialogTitle>
+          <DialogContent>
+            <TextField margin="dense" label="Código" name="codigo" fullWidth value={form.codigo} onChange={handleChange} />
+            <TextField margin="dense" label="Nombre" name="nombre" fullWidth value={form.nombre} onChange={handleChange} />
+            <TextField margin="dense" label="Descripción" name="descripcion" fullWidth value={form.descripcion} onChange={handleChange} />
+            <TextField margin="dense" label="Precio" name="precio" type="number" fullWidth value={form.precio} onChange={handleChange} />
+            <TextField margin="dense" label="Stock" name="stock" type="number" fullWidth value={form.stock} onChange={handleChange} />
+            <TextField margin="dense" label="Categoría" name="categoria_nombre" fullWidth value={form.categoria_nombre} onChange={handleChange} />
+            {formError && <Alert severity="error">{formError}</Alert>}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancelar</Button>
+            <Button onClick={handleSubmit} variant="contained">Guardar</Button>
+          </DialogActions>
+        </Dialog>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}><CircularProgress /></Box>
         ) : error ? (
