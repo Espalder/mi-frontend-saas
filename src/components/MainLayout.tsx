@@ -62,7 +62,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       { text: 'Dashboard', icon: <BusinessOutlinedIcon />, path: '/dashboard' },
       { text: 'Productos', icon: <Inventory2OutlinedIcon />, path: '/productos' },
       { text: 'Clientes', icon: <PeopleAltOutlinedIcon />, path: '/clientes', adminOnly: true },
-      { text: 'Ventas', icon: <PointOfSaleOutlinedIcon />, path: '/ventas' },
+      { text: 'Ventas', icon: <PointOfSaleOutlinedIcon />, path: '/ventas', adminOnly: true },
       { text: 'Usuarios', icon: <GroupOutlinedIcon />, path: '/usuarios', adminOnly: true },
       { text: 'Empresa', icon: <BusinessOutlinedIcon />, path: '/empresa', adminOnly: true },
       { text: 'Reportes', icon: <AssessmentOutlinedIcon />, path: '/reportes', adminOnly: true },
@@ -70,9 +70,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     if (!user) return allMenuItems;
 
-    // Si es vendedor, solo mostrar dashboard, productos y ventas
-    if (user.rol === 'vendedor') {
+    // Si es inventario, solo mostrar dashboard y productos
+    if (user.rol === 'inventario') {
       return allMenuItems.filter(item => !item.adminOnly);
+    }
+
+    // Si es vendedor, mostrar dashboard, productos y ventas
+    if (user.rol === 'vendedor') {
+      return allMenuItems.filter(item => !item.adminOnly || item.text === 'Ventas');
     }
 
     // Si es admin, mostrar todo
