@@ -34,7 +34,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    api.get('/api/usuarios/me')
+    api.get('usuarios/me')
       .then(res => setUser(res.data))
       .catch(() => setUser(null));
   }, []);
