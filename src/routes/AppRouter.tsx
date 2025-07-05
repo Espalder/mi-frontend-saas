@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
@@ -10,10 +10,52 @@ import EmpresaPage from '../pages/EmpresaPage';
 import ReportesPage from '../pages/ReportesPage';
 import { getToken } from '../services/authService';
 import MainLayout from '../components/MainLayout';
+import api from '../services/api';
 
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+interface User {
+  id: number;
+  username: string;
+  nombre: string;
+  email: string;
+  rol: string;
+  empresa_id: number;
+}
+
+const PrivateRoute = ({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const token = getToken();
-  return token ? <>{children}</> : <Navigate to="/login" replace />;
+
+  useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    api.get('/api/usuarios/me')
+      .then(res => setUser(res.data))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Si se requiere un rol específico, verificar
+  if (requiredRole && user.rol !== requiredRole) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const AppRouter: React.FC = () => {
@@ -54,7 +96,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/clientes"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="admin">
               <MainLayout>
                 <ClientesPage />
               </MainLayout>
@@ -74,7 +116,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/usuarios"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="admin">
               <MainLayout>
                 <UsuariosPage />
               </MainLayout>
@@ -84,7 +126,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/empresa"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="admin">
               <MainLayout>
                 <EmpresaPage />
               </MainLayout>
@@ -94,7 +136,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/reportes"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="admin">
               <MainLayout>
                 <ReportesPage />
               </MainLayout>

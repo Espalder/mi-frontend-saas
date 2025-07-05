@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, useTheme, ThemeProvider, createTheme, Avatar, ListItemButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
@@ -10,19 +10,18 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { removeToken } from '../services/authService';
-// import logo from '../assets/logo_empresa.png';
+import api from '../services/api';
 
 const drawerWidth = 220;
 
-const menuItems = [
-  { text: 'Dashboard', icon: <BusinessOutlinedIcon />, path: '/dashboard' },
-  { text: 'Productos', icon: <Inventory2OutlinedIcon />, path: '/productos' },
-  { text: 'Clientes', icon: <PeopleAltOutlinedIcon />, path: '/clientes' },
-  { text: 'Ventas', icon: <PointOfSaleOutlinedIcon />, path: '/ventas' },
-  { text: 'Usuarios', icon: <GroupOutlinedIcon />, path: '/usuarios' },
-  { text: 'Empresa', icon: <BusinessOutlinedIcon />, path: '/empresa' },
-  { text: 'Reportes', icon: <AssessmentOutlinedIcon />, path: '/reportes' },
-];
+interface User {
+  id: number;
+  username: string;
+  nombre: string;
+  email: string;
+  rol: string;
+  empresa_id: number;
+}
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,8 +29,15 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
   });
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    api.get('/api/usuarios/me')
+      .then(res => setUser(res.data))
+      .catch(() => setUser(null));
+  }, []);
 
   const theme = createTheme({
     palette: {
@@ -50,11 +56,41 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     navigate('/login');
   };
 
+  // Filtrar menús según el rol del usuario
+  const getMenuItems = () => {
+    const allMenuItems = [
+      { text: 'Dashboard', icon: <BusinessOutlinedIcon />, path: '/dashboard' },
+      { text: 'Productos', icon: <Inventory2OutlinedIcon />, path: '/productos' },
+      { text: 'Clientes', icon: <PeopleAltOutlinedIcon />, path: '/clientes', adminOnly: true },
+      { text: 'Ventas', icon: <PointOfSaleOutlinedIcon />, path: '/ventas' },
+      { text: 'Usuarios', icon: <GroupOutlinedIcon />, path: '/usuarios', adminOnly: true },
+      { text: 'Empresa', icon: <BusinessOutlinedIcon />, path: '/empresa', adminOnly: true },
+      { text: 'Reportes', icon: <AssessmentOutlinedIcon />, path: '/reportes', adminOnly: true },
+    ];
+
+    if (!user) return allMenuItems;
+
+    // Si es vendedor, solo mostrar dashboard, productos y ventas
+    if (user.rol === 'vendedor') {
+      return allMenuItems.filter(item => !item.adminOnly);
+    }
+
+    // Si es admin, mostrar todo
+    return allMenuItems;
+  };
+
+  const menuItems = getMenuItems();
+
   const drawer = (
     <Box>
       <Box display="flex" flexDirection="column" alignItems="center" p={2}>
         <Avatar src={process.env.PUBLIC_URL + '/logo_empresa.png'} alt="Logo Empresa" sx={{ width: 64, height: 64, mb: 2, bgcolor: theme.palette.background.paper, boxShadow: 2 }} />
         <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: theme.palette.text.primary }}>Mi Empresa</Typography>
+        {user && (
+          <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+            {user.nombre} ({user.rol})
+          </Typography>
+        )}
       </Box>
       <List>
         {menuItems.map(item => (
