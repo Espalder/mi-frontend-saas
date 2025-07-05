@@ -7,20 +7,20 @@ export interface Cliente {
 }
 
 export async function getClientes(): Promise<Cliente[]> {
-  const res = await api.get<Cliente[]>('clientes');
+  const res = await api.get<Cliente[]>('/api/clientes');
   return res.data;
 }
 
 export async function createCliente(data: Partial<Cliente>): Promise<Cliente> {
-  const res = await api.post<Cliente>('clientes', data);
+  const res = await api.post<Cliente>('/api/clientes', data);
   return res.data;
 }
 
 export async function updateCliente(id: number, data: Partial<Cliente>): Promise<Cliente> {
-  const res = await api.put<Cliente>(`clientes/${id}`, data);
+  const res = await api.put<Cliente>(`/api/clientes/${id}`, data);
   return res.data;
 }
 
 export async function deleteCliente(id: number): Promise<void> {
-  await api.delete(`clientes/${id}`);
+  await api.delete(`/api/clientes/${id}`);
 } 

@@ -9,7 +9,12 @@ export interface Empresa {
   ruc?: string;
 }
 
-export async function getEmpresaActual(): Promise<Empresa> {
-  const res = await api.get<Empresa>('empresas/me');
+export async function getEmpresa(): Promise<Empresa> {
+  const res = await api.get<Empresa>('/api/empresas/me');
+  return res.data;
+}
+
+export async function updateEmpresa(data: Partial<Empresa>): Promise<Empresa> {
+  const res = await api.put<Empresa>('/api/empresas/me', data);
   return res.data;
 } 

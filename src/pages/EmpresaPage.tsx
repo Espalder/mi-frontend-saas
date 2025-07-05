@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, CircularProgress, Alert } from '@mui/material';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
-import { getEmpresaActual, Empresa } from '../services/empresaService';
+import { getEmpresa, Empresa } from '../services/empresaService';
 import { useTheme } from '@mui/material/styles';
 
 const EmpresaPage: React.FC = () => {
@@ -11,7 +11,7 @@ const EmpresaPage: React.FC = () => {
   const theme = useTheme();
 
   useEffect(() => {
-    getEmpresaActual()
+    getEmpresa()
       .then(setEmpresa)
       .catch(() => setError('No se pudo cargar la información de la empresa'))
       .finally(() => setLoading(false));

@@ -6,6 +6,6 @@ export interface ReporteGeneral {
 }
 
 export async function getReporteGeneral(): Promise<ReporteGeneral> {
-  const res = await api.get<ReporteGeneral>('reportes/general');
+  const res = await api.get<ReporteGeneral>('/api/reportes/general');
   return res.data;
 } 

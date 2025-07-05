@@ -17,20 +17,20 @@ export interface Producto {
 }
 
 export async function getProductos(): Promise<Producto[]> {
-  const res = await api.get<Producto[]>('productos');
+  const res = await api.get<Producto[]>('/api/productos');
   return res.data;
 }
 
 export async function createProducto(data: Partial<Producto>): Promise<Producto> {
-  const res = await api.post<Producto>('productos', data);
+  const res = await api.post<Producto>('/api/productos', data);
   return res.data;
 }
 
 export async function updateProducto(id: number, data: Partial<Producto>): Promise<Producto> {
-  const res = await api.put<Producto>(`productos/${id}`, data);
+  const res = await api.put<Producto>(`/api/productos/${id}`, data);
   return res.data;
 }
 
 export async function deleteProducto(id: number): Promise<void> {
-  await api.delete(`productos/${id}`);
+  await api.delete(`/api/productos/${id}`);
 } 

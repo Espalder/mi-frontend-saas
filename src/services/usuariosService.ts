@@ -13,20 +13,20 @@ export interface Usuario {
 }
 
 export async function getUsuarios(): Promise<Usuario[]> {
-  const res = await api.get<Usuario[]>('usuarios');
+  const res = await api.get<Usuario[]>('/api/usuarios');
   return res.data;
 }
 
 export async function createUsuario(data: Partial<Usuario>): Promise<Usuario> {
-  const res = await api.post<Usuario>('usuarios', data);
+  const res = await api.post<Usuario>('/api/usuarios', data);
   return res.data;
 }
 
 export async function updateUsuario(id: number, data: Partial<Usuario>): Promise<Usuario> {
-  const res = await api.put<Usuario>(`usuarios/${id}`, data);
+  const res = await api.put<Usuario>(`/api/usuarios/${id}`, data);
   return res.data;
 }
 
 export async function deleteUsuario(id: number): Promise<void> {
-  await api.delete(`usuarios/${id}`);
+  await api.delete(`/api/usuarios/${id}`);
 } 
