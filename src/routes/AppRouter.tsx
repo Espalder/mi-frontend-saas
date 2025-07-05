@@ -32,7 +32,7 @@ const PrivateRoute = ({ children, requiredRole }: { children: React.ReactNode; r
       return;
     }
 
-    api.get('/api/usuarios/me')
+    api.get('usuarios/me')
       .then(res => setUser(res.data))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
