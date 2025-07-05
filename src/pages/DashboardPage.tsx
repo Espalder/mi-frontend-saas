@@ -8,7 +8,7 @@ const DashboardPage: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.get('usuarios/me')
+    api.get('/api/usuarios/me')
       .then(res => setUser(res.data))
       .catch(() => setError('No se pudo cargar el usuario'))
       .finally(() => setLoading(false));
