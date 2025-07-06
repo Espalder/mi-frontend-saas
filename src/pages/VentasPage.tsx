@@ -8,6 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import api from '../services/api';
 
 const VentasPage: React.FC = () => {
   const [ventas, setVentas] = useState<Venta[]>([]);
@@ -26,6 +27,7 @@ const VentasPage: React.FC = () => {
   const [clienteId, setClienteId] = useState<number|null>(null);
   const [numeroFactura, setNumeroFactura] = useState('');
   const [notas, setNotas] = useState('');
+  const [user, setUser] = useState<any>(null);
 
   const handleOpen = (venta?: Venta) => {
     setOpen(true);
@@ -133,6 +135,9 @@ const VentasPage: React.FC = () => {
       .finally(() => setLoading(false));
     getClientes().then(setClientes);
     getProductos().then(setProductos);
+    api.get('usuarios/me')
+      .then(res => setUser(res.data))
+      .catch(() => setUser(null));
   }, []);
 
   return (
