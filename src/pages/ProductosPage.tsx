@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { getProductos, Producto, createProducto, updateProducto, deleteProducto } from '../services/productosService';
 import { getCategorias } from '../services/categoriasService';
 import { useTheme } from '@mui/material/styles';
 import api from '../services/api';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const ProductosPage: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -26,7 +30,16 @@ const ProductosPage: React.FC = () => {
   const [formError, setFormError] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [autoCodigo, setAutoCodigo] = useState(false);
   const theme = useTheme();
+
+  const getNextCodigo = () => {
+    if (productos.length === 0) return 'PROD-001';
+    const codigos = productos.map(p => p.codigo).filter(c => /^PROD-\d+$/.test(c));
+    const nums = codigos.map(c => parseInt(c.replace('PROD-', '')));
+    const max = Math.max(...nums, 0);
+    return `PROD-${(max + 1).toString().padStart(3, '0')}`;
+  };
 
   useEffect(() => {
     getProductos()
@@ -42,7 +55,13 @@ const ProductosPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleOpen = () => { setOpen(true); setFormError(''); };
+  const handleOpen = () => {
+    setOpen(true);
+    setFormError('');
+    if (autoCodigo) {
+      setForm(f => ({ ...f, codigo: getNextCodigo() }));
+    }
+  };
   const handleEdit = (producto: Producto) => {
     setForm({
       codigo: producto.codigo,
@@ -72,6 +91,12 @@ const ProductosPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  const handleAutoCodigo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAutoCodigo(e.target.checked);
+    if (e.target.checked) {
+      setForm(f => ({ ...f, codigo: getNextCodigo() }));
+    }
   };
   const handleSubmit = async () => {
     if (!user) { setFormError('Usuario no autenticado'); return; }
@@ -124,6 +149,9 @@ const ProductosPage: React.FC = () => {
     setOpen(false);
     setEditMode(false);
     setEditId(null);
+    setForm({
+      codigo: '', nombre: '', descripcion: '', precio: '', precio_compra: '', precio_venta: '', stock: '', categoria_id: ''
+    });
   };
 
   return (
@@ -131,16 +159,17 @@ const ProductosPage: React.FC = () => {
       <Paper elevation={3} sx={{ p: 4, minWidth: 350, bgcolor: 'background.paper', mb: 3, width: '100%', maxWidth: 900 }}>
         <Box display="flex" alignItems="center" mb={2}>
           <Inventory2OutlinedIcon color="primary" sx={{ fontSize: 40, mr: 1 }} />
-          <Typography variant="h5" color="text.primary">Gestión de productos</Typography>
+          <Typography variant="h5" color="text.primary">Gestión de inventario</Typography>
         </Box>
         <Typography variant="body1" mb={2} color="text.secondary">
-          Aquí podrás ver, agregar, editar y eliminar productos de tu empresa.
+          Aquí podrás ver, agregar, editar y eliminar productos de tu inventario.
         </Typography>
         <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={handleOpen}>Agregar producto</Button>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>{editMode ? 'Editar producto' : 'Agregar producto'}</DialogTitle>
           <DialogContent>
-            <TextField margin="dense" label="Código" name="codigo" fullWidth value={form.codigo} onChange={handleChange} />
+            <TextField margin="dense" label="Código" name="codigo" fullWidth value={form.codigo} onChange={handleChange} disabled={autoCodigo} />
+            <FormControlLabel control={<Checkbox checked={autoCodigo} onChange={handleAutoCodigo} />} label="Autogenerar código" />
             <TextField margin="dense" label="Nombre" name="nombre" fullWidth value={form.nombre} onChange={handleChange} />
             <TextField margin="dense" label="Descripción" name="descripcion" fullWidth value={form.descripcion} onChange={handleChange} />
             <TextField margin="dense" label="Precio" name="precio" type="number" fullWidth value={form.precio} onChange={handleChange} />
@@ -190,8 +219,8 @@ const ProductosPage: React.FC = () => {
                     <TableCell>{prod.stock}</TableCell>
                     <TableCell>{prod.categoria_nombre}</TableCell>
                     <TableCell>
-                      <Button size="small" onClick={() => handleEdit(prod)}>Editar</Button>
-                      <Button size="small" color="error" onClick={() => handleDelete(prod.id)}>Eliminar</Button>
+                      <Button size="small" onClick={() => handleEdit(prod)}><EditIcon /></Button>
+                      <Button size="small" color="error" onClick={() => handleDelete(prod.id)}><DeleteIcon /></Button>
                     </TableCell>
                   </TableRow>
                 ))}

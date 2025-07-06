@@ -66,10 +66,9 @@ const VentasPage: React.FC = () => {
     setDetalles(detalles.filter((_, i) => i !== idx));
   };
   const calcularTotales = () => {
-    const subtotal = detalles.reduce((acc, d) => acc + (parseFloat(d.subtotal) || 0), 0);
-    const descuento = parseFloat(form.descuento) || 0;
-    const total = subtotal - descuento;
-    return { subtotal, descuento, total };
+    const subtotal = detalles.reduce((acc, d) => acc + (d.cantidad * d.precio_unitario), 0);
+    const total = subtotal - (form.descuento || 0);
+    return { subtotal, descuento: parseFloat(form.descuento) || 0, total };
   };
   const handleSubmit = async () => {
     try {
@@ -102,7 +101,18 @@ const VentasPage: React.FC = () => {
       if (editId) {
         await updateVenta(editId, data);
       } else {
-        await createVenta(data);
+        await createVenta({
+          cliente_id: form.cliente_id,
+          usuario_id: user.id,
+          numero_factura: form.numero_factura,
+          fecha: new Date().toISOString(),
+          subtotal,
+          descuento: form.descuento || 0,
+          total,
+          estado: form.estado,
+          notas: form.notas,
+          detalles: detalles.map(d => ({ producto_id: d.producto_id, cantidad: d.cantidad, precio_unitario: d.precio_unitario, subtotal: d.cantidad * d.precio_unitario }))
+        });
       }
       setOpen(false);
       setLoading(true);
@@ -128,6 +138,13 @@ const VentasPage: React.FC = () => {
       .finally(() => setLoading(false));
   };
 
+  const getNextFactura = () => {
+    if (ventas.length === 0) return '000001';
+    const nums = ventas.map(v => parseInt(v.numero_factura || '0')).filter(n => !isNaN(n));
+    const max = Math.max(...nums, 0);
+    return (max + 1).toString().padStart(6, '0');
+  };
+
   useEffect(() => {
     getVentas()
       .then(setVentas)
@@ -139,6 +156,12 @@ const VentasPage: React.FC = () => {
       .then(res => setUser(res.data))
       .catch(() => setUser(null));
   }, []);
+
+  useEffect(() => {
+    if (!editId) {
+      setForm(f => ({ ...f, numero_factura: getNextFactura() }));
+    }
+  }, [ventas, editId]);
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" minHeight="80vh" bgcolor={theme => theme.palette.background.default} p={4}>
@@ -158,7 +181,7 @@ const VentasPage: React.FC = () => {
               <option value="">Seleccionar cliente</option>
               {clientes.map(cli => <option key={cli.id} value={cli.id}>{cli.nombre}</option>)}
             </TextField>
-            <TextField margin="dense" label="N° Factura" name="numero_factura" fullWidth value={numeroFactura} onChange={e => setNumeroFactura(e.target.value)} />
+            <TextField margin="dense" label="N° Factura" name="numero_factura" fullWidth value={form.numero_factura} onChange={handleChange} />
             <TextField margin="dense" label="Notas" name="notas" fullWidth value={notas} onChange={e => setNotas(e.target.value)} />
             <Box mt={2} mb={2}>
               <Typography variant="subtitle1">Productos</Typography>
@@ -179,9 +202,9 @@ const VentasPage: React.FC = () => {
             <TextField margin="dense" label="Descuento" name="descuento" type="number" fullWidth value={form.descuento} onChange={handleChange} />
             <TextField margin="dense" label="Estado" name="estado" fullWidth value={form.estado} onChange={handleChange} />
             <Box mt={2}>
-              <Typography variant="subtitle2">Subtotal: {calcularTotales().subtotal}</Typography>
-              <Typography variant="subtitle2">Descuento: {calcularTotales().descuento}</Typography>
-              <Typography variant="subtitle2">Total: {calcularTotales().total}</Typography>
+              <Typography>Subtotal: {calcularTotales().subtotal}</Typography>
+              <Typography>Descuento: {calcularTotales().descuento}</Typography>
+              <Typography>Total: {calcularTotales().total}</Typography>
             </Box>
             {formError && <Alert severity="error">{formError}</Alert>}
           </DialogContent>

@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getClientes, Cliente, createCliente, updateCliente, deleteCliente } from '../services/clientesService';
 import { useTheme } from '@mui/material/styles';
+import { useAuth } from '../context/AuthContext';
 
 const ClientesPage: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -15,6 +16,7 @@ const ClientesPage: React.FC = () => {
   const [form, setForm] = useState({ nombre: '' });
   const [formError, setFormError] = useState('');
   const theme = useTheme();
+  const { user } = useAuth();
 
   useEffect(() => {
     getClientes()
@@ -43,7 +45,7 @@ const ClientesPage: React.FC = () => {
       if (editId) {
         await updateCliente(editId, form);
       } else {
-        await createCliente(form);
+        await createCliente({ nombre: form.nombre, empresa_id: user.empresa_id });
       }
       setOpen(false);
       setLoading(true);
