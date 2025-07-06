@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import { getProductos, Producto, createProducto } from '../services/productosService';
+import { getProductos, Producto, createProducto, updateProducto, deleteProducto } from '../services/productosService';
 import { getCategorias } from '../services/categoriasService';
 import { useTheme } from '@mui/material/styles';
 import api from '../services/api';
@@ -24,6 +24,8 @@ const ProductosPage: React.FC = () => {
     categoria_id: ''
   });
   const [formError, setFormError] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
   const theme = useTheme();
 
   useEffect(() => {
@@ -41,7 +43,33 @@ const ProductosPage: React.FC = () => {
   }, []);
 
   const handleOpen = () => { setOpen(true); setFormError(''); };
-  const handleClose = () => setOpen(false);
+  const handleEdit = (producto: Producto) => {
+    setForm({
+      codigo: producto.codigo,
+      nombre: producto.nombre,
+      descripcion: producto.descripcion || '',
+      precio: producto.precio.toString(),
+      precio_compra: producto.precio_compra.toString(),
+      precio_venta: producto.precio_venta.toString(),
+      stock: producto.stock.toString(),
+      categoria_id: producto.categoria_id ? producto.categoria_id.toString() : ''
+    });
+    setEditId(producto.id);
+    setEditMode(true);
+    setOpen(true);
+    setFormError('');
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('¿Seguro que deseas eliminar este producto?')) return;
+    setLoading(true);
+    await deleteProducto(id);
+    getProductos()
+      .then(setProductos)
+      .catch(() => setError('No se pudieron cargar los productos'))
+      .finally(() => setLoading(false));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -52,27 +80,50 @@ const ProductosPage: React.FC = () => {
       return;
     }
     try {
-      await createProducto({
-        codigo: form.codigo,
-        nombre: form.nombre,
-        descripcion: form.descripcion,
-        precio: parseFloat(form.precio),
-        precio_compra: parseFloat(form.precio_compra),
-        precio_venta: form.precio_venta ? parseFloat(form.precio_venta) : parseFloat(form.precio),
-        stock: parseInt(form.stock),
-        stock_minimo: 0,
-        categoria_id: parseInt(form.categoria_id),
-        empresa_id: user.empresa_id
-      });
+      if (editMode && editId) {
+        await updateProducto(editId, {
+          codigo: form.codigo,
+          nombre: form.nombre,
+          descripcion: form.descripcion,
+          precio: parseFloat(form.precio),
+          precio_compra: parseFloat(form.precio_compra),
+          precio_venta: form.precio_venta ? parseFloat(form.precio_venta) : parseFloat(form.precio),
+          stock: parseInt(form.stock),
+          stock_minimo: 0,
+          categoria_id: parseInt(form.categoria_id),
+          empresa_id: user.empresa_id
+        });
+      } else {
+        await createProducto({
+          codigo: form.codigo,
+          nombre: form.nombre,
+          descripcion: form.descripcion,
+          precio: parseFloat(form.precio),
+          precio_compra: parseFloat(form.precio_compra),
+          precio_venta: form.precio_venta ? parseFloat(form.precio_venta) : parseFloat(form.precio),
+          stock: parseInt(form.stock),
+          stock_minimo: 0,
+          categoria_id: parseInt(form.categoria_id),
+          empresa_id: user.empresa_id
+        });
+      }
       setOpen(false);
+      setEditMode(false);
+      setEditId(null);
       setLoading(true);
       getProductos()
         .then(setProductos)
         .catch(() => setError('No se pudieron cargar los productos'))
         .finally(() => setLoading(false));
     } catch (err: any) {
-      setFormError('Error al crear producto');
+      setFormError('Error al guardar producto');
     }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditMode(false);
+    setEditId(null);
   };
 
   return (
@@ -87,7 +138,7 @@ const ProductosPage: React.FC = () => {
         </Typography>
         <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={handleOpen}>Agregar producto</Button>
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Agregar producto</DialogTitle>
+          <DialogTitle>{editMode ? 'Editar producto' : 'Agregar producto'}</DialogTitle>
           <DialogContent>
             <TextField margin="dense" label="Código" name="codigo" fullWidth value={form.codigo} onChange={handleChange} />
             <TextField margin="dense" label="Nombre" name="nombre" fullWidth value={form.nombre} onChange={handleChange} />
@@ -126,6 +177,7 @@ const ProductosPage: React.FC = () => {
                   <TableCell>Precio</TableCell>
                   <TableCell>Stock</TableCell>
                   <TableCell>Categoría</TableCell>
+                  <TableCell>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -137,6 +189,10 @@ const ProductosPage: React.FC = () => {
                     <TableCell>{prod.precio}</TableCell>
                     <TableCell>{prod.stock}</TableCell>
                     <TableCell>{prod.categoria_nombre}</TableCell>
+                    <TableCell>
+                      <Button size="small" onClick={() => handleEdit(prod)}>Editar</Button>
+                      <Button size="small" color="error" onClick={() => handleDelete(prod.id)}>Eliminar</Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

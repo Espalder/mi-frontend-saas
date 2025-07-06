@@ -7,12 +7,19 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { getVentas, Venta } from '../services/ventasService';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import dayjs, { Dayjs } from 'dayjs';
 
 const ReportesPage: React.FC = () => {
   const [reporte, setReporte] = useState<ReporteGeneral | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [ventas, setVentas] = useState<Venta[]>([]);
+  const [fechaInicio, setFechaInicio] = useState<Dayjs | null>(dayjs().startOf('day'));
+  const [fechaFin, setFechaFin] = useState<Dayjs | null>(dayjs().endOf('day'));
+  const [rango, setRango] = useState('dia');
   const theme = useTheme();
 
   useEffect(() => {
@@ -34,12 +41,47 @@ const ReportesPage: React.FC = () => {
     doc.save('reporte_ventas.pdf');
   };
 
+  const handleRangoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setRango(value);
+    if (value === 'dia') {
+      setFechaInicio(dayjs().startOf('day'));
+      setFechaFin(dayjs().endOf('day'));
+    } else if (value === 'semana') {
+      setFechaInicio(dayjs().startOf('week'));
+      setFechaFin(dayjs().endOf('week'));
+    } else if (value === 'mes') {
+      setFechaInicio(dayjs().startOf('month'));
+      setFechaFin(dayjs().endOf('month'));
+    } else if (value === 'año') {
+      setFechaInicio(dayjs().startOf('year'));
+      setFechaFin(dayjs().endOf('year'));
+    }
+  };
+
+  // Lógica para filtrar y mostrar reportes según fechaInicio y fechaFin
+
   return (
     <Box display="flex" flexDirection="column" alignItems="center" minHeight="80vh" bgcolor={theme => theme.palette.background.default} p={4}>
       <Paper elevation={3} sx={{ p: 4, minWidth: 350, bgcolor: 'background.paper', mb: 3, width: '100%', maxWidth: 600 }}>
         <Box display="flex" alignItems="center" mb={2}>
           <AssessmentOutlinedIcon color="primary" sx={{ fontSize: 40, mr: 1 }} />
           <Typography variant="h5" color="text.primary">Reportes y Estadísticas</Typography>
+        </Box>
+        <Box mb={2}>
+          <select value={rango} onChange={handleRangoChange}>
+            <option value="dia">Día</option>
+            <option value="semana">Semana</option>
+            <option value="mes">Mes</option>
+            <option value="año">Año</option>
+            <option value="personalizado">Personalizado</option>
+          </select>
+          {rango === 'personalizado' && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label="Desde" value={fechaInicio} onChange={setFechaInicio} />
+              <DatePicker label="Hasta" value={fechaFin} onChange={setFechaFin} />
+            </LocalizationProvider>
+          )}
         </Box>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}><CircularProgress /></Box>
