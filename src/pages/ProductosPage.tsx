@@ -2,20 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { getProductos, Producto, createProducto } from '../services/productosService';
+import { getCategorias } from '../services/categoriasService';
 import { useTheme } from '@mui/material/styles';
+import api from '../services/api';
 
 const ProductosPage: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
+  const [categorias, setCategorias] = useState<{id: number, nombre: string}[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [form, setForm] = useState({
     codigo: '',
     nombre: '',
     descripcion: '',
     precio: '',
     stock: '',
-    categoria_nombre: ''
+    categoria_id: ''
   });
   const [formError, setFormError] = useState('');
   const theme = useTheme();
@@ -23,21 +27,33 @@ const ProductosPage: React.FC = () => {
   useEffect(() => {
     getProductos()
       .then(setProductos)
-      .catch(() => setError('No se pudieron cargar los productos'))
+      .catch(() => setError('No se pudieron cargar los productos'));
+    getCategorias()
+      .then(setCategorias)
+      .catch(() => setError('No se pudieron cargar las categorías'));
+    // Obtener usuario autenticado
+    api.get('usuarios/me')
+      .then(res => setUser(res.data))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   const handleOpen = () => { setOpen(true); setFormError(''); };
   const handleClose = () => setOpen(false);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
   const handleSubmit = async () => {
+    if (!user) { setFormError('Usuario no autenticado'); return; }
     try {
       await createProducto({
-        ...form,
+        codigo: form.codigo,
+        nombre: form.nombre,
+        descripcion: form.descripcion,
         precio: parseFloat(form.precio),
-        stock: parseInt(form.stock)
+        stock: parseInt(form.stock),
+        categoria_id: parseInt(form.categoria_id),
+        empresa_id: user.empresa_id
       });
       setOpen(false);
       setLoading(true);
@@ -69,7 +85,12 @@ const ProductosPage: React.FC = () => {
             <TextField margin="dense" label="Descripción" name="descripcion" fullWidth value={form.descripcion} onChange={handleChange} />
             <TextField margin="dense" label="Precio" name="precio" type="number" fullWidth value={form.precio} onChange={handleChange} />
             <TextField margin="dense" label="Stock" name="stock" type="number" fullWidth value={form.stock} onChange={handleChange} />
-            <TextField margin="dense" label="Categoría" name="categoria_nombre" fullWidth value={form.categoria_nombre} onChange={handleChange} />
+            <TextField margin="dense" label="Categoría" name="categoria_id" select fullWidth value={form.categoria_id} onChange={handleChange} SelectProps={{ native: true }}>
+              <option value="">Seleccione una categoría</option>
+              {categorias.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+              ))}
+            </TextField>
             {formError && <Alert severity="error">{formError}</Alert>}
           </DialogContent>
           <DialogActions>
