@@ -4,7 +4,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import { getReporteGeneral, ReporteGeneral } from '../services/reportesService';
 import { useTheme } from '@mui/material/styles';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { getVentas, Venta } from '../services/ventasService';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -30,13 +30,25 @@ const ReportesPage: React.FC = () => {
     getVentas().then(setVentas);
   }, []);
 
+  // Filtrar ventas por fechaInicio y fechaFin
+  const ventasFiltradas = ventas.filter(v => {
+    const fecha = dayjs(v.fecha);
+    return (!fechaInicio || fecha.isAfter(fechaInicio.subtract(1, 'day'))) && (!fechaFin || fecha.isBefore(fechaFin.add(1, 'day')));
+  });
+
   const handleDescargarPDF = () => {
     const doc = new jsPDF();
     doc.text('Reporte General', 10, 10);
-    // @ts-ignore
-    doc.autoTable({
+    autoTable(doc, {
       head: [['ID', 'Fecha', 'Subtotal', 'Descuento', 'Total', 'Estado']],
-      body: ventas.map(v => [v.id, v.fecha, v.subtotal, v.descuento, v.total, v.estado])
+      body: ventasFiltradas.map(v => [
+        v.id ?? '',
+        v.fecha ?? '',
+        v.subtotal ?? '',
+        v.descuento ?? '',
+        v.total ?? '',
+        v.estado ?? ''
+      ])
     });
     doc.save('reporte_ventas.pdf');
   };
@@ -109,7 +121,7 @@ const ReportesPage: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {ventas.map((venta) => (
+                  {ventasFiltradas.map((venta) => (
                     <TableRow key={venta.id}>
                       <TableCell>{venta.id}</TableCell>
                       <TableCell>{venta.fecha}</TableCell>
