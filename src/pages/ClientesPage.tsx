@@ -86,11 +86,12 @@ const ClientesPage: React.FC = () => {
           <DialogTitle>{editId ? 'Editar cliente' : 'Añadir cliente'}</DialogTitle>
           <DialogContent>
             <TextField margin="dense" label="Nombre" name="nombre" fullWidth value={form.nombre} onChange={handleChange} />
-            {formError && <Alert severity="error">{formError}</Alert>}
+            {!user && <Alert severity="error">Usuario no autenticado</Alert>}
+            {formError && user && <Alert severity="error">{formError}</Alert>}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleSubmit} variant="contained">Guardar</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={!user}>Guardar</Button>
           </DialogActions>
         </Dialog>
         {loading ? (
