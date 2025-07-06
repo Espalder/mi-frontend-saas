@@ -67,8 +67,9 @@ const VentasPage: React.FC = () => {
   };
   const calcularTotales = () => {
     const subtotal = detalles.reduce((acc, d) => acc + (d.cantidad * d.precio_unitario), 0);
-    const total = subtotal - (form.descuento || 0);
-    return { subtotal, descuento: parseFloat(form.descuento) || 0, total };
+    const descuento = parseFloat(form.descuento) || 0;
+    const total = subtotal - descuento;
+    return { subtotal, descuento, total };
   };
   const handleSubmit = async () => {
     try {
