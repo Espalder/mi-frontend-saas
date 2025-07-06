@@ -103,16 +103,21 @@ const VentasPage: React.FC = () => {
         await updateVenta(editId, data);
       } else {
         await createVenta({
-          cliente_id: typeof clienteId === 'number' ? clienteId : undefined,
+          empresa_id: user.empresa_id,
           usuario_id: user.id,
+          cliente_id: typeof clienteId === 'number' ? clienteId : undefined,
           numero_factura: numeroFactura,
-          fecha: new Date().toISOString(),
-          subtotal,
+          subtotal: Number(subtotal),
           descuento: parseFloat(form.descuento) || 0,
-          total,
+          total: Number(total),
           estado: form.estado,
           notas,
-          detalles: detalles.map(d => ({ producto_id: d.producto_id, cantidad: d.cantidad, precio_unitario: d.precio_unitario, subtotal: d.cantidad * d.precio_unitario }))
+          detalles: detalles.map(d => ({
+            producto_id: Number(d.producto_id),
+            cantidad: Number(d.cantidad),
+            precio_unitario: Number(d.precio_unitario),
+            subtotal: Number(d.subtotal)
+          }))
         });
       }
       setOpen(false);
