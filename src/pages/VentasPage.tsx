@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import PointOfSaleOutlinedIcon from '@mui/icons-material/PointOfSaleOutlined';
 import { getVentas, Venta, createVenta, updateVenta, deleteVenta } from '../services/ventasService';
+import { getClientes, Cliente } from '../services/clientesService';
+import { getProductos, Producto } from '../services/productosService';
 import { useTheme } from '@mui/material/styles';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,6 +20,13 @@ const VentasPage: React.FC = () => {
   const [form, setForm] = useState({ subtotal: '', descuento: '', total: '', estado: '' });
   const [formError, setFormError] = useState('');
 
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [detalles, setDetalles] = useState<any[]>([]);
+  const [clienteId, setClienteId] = useState<number|null>(null);
+  const [numeroFactura, setNumeroFactura] = useState('');
+  const [notas, setNotas] = useState('');
+
   const handleOpen = (venta?: Venta) => {
     setOpen(true);
     setFormError('');
@@ -33,14 +42,51 @@ const VentasPage: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const handleAddDetalle = () => {
+    setDetalles([...detalles, { producto_id: '', cantidad: 1, precio_unitario: 0, subtotal: 0 }]);
+  };
+  const handleDetalleChange = (idx: number, field: string, value: any) => {
+    const newDetalles = [...detalles];
+    newDetalles[idx][field] = value;
+    if (field === 'producto_id') {
+      const prod = productos.find(p => p.id === parseInt(value));
+      if (prod) {
+        newDetalles[idx].precio_unitario = prod.precio;
+        newDetalles[idx].subtotal = prod.precio * newDetalles[idx].cantidad;
+      }
+    }
+    if (field === 'cantidad' || field === 'precio_unitario') {
+      newDetalles[idx].subtotal = newDetalles[idx].cantidad * newDetalles[idx].precio_unitario;
+    }
+    setDetalles(newDetalles);
+  };
+  const handleRemoveDetalle = (idx: number) => {
+    setDetalles(detalles.filter((_, i) => i !== idx));
+  };
+  const calcularTotales = () => {
+    const subtotal = detalles.reduce((acc, d) => acc + (parseFloat(d.subtotal) || 0), 0);
+    const descuento = parseFloat(form.descuento) || 0;
+    const total = subtotal - descuento;
+    return { subtotal, descuento, total };
+  };
   const handleSubmit = async () => {
     try {
-      const data = {
-        subtotal: parseFloat(form.subtotal),
-        descuento: parseFloat(form.descuento),
-        total: parseFloat(form.total),
-        estado: form.estado
+      const { subtotal, descuento, total } = calcularTotales();
+      const data: any = {
+        numero_factura: numeroFactura,
+        subtotal,
+        descuento,
+        total,
+        estado: form.estado,
+        notas,
+        detalles: detalles.map(d => ({
+          producto_id: parseInt(d.producto_id),
+          cantidad: parseInt(d.cantidad),
+          precio_unitario: parseFloat(d.precio_unitario),
+          subtotal: parseFloat(d.subtotal)
+        }))
       };
+      if (typeof clienteId === 'number') data.cliente_id = clienteId;
       if (editId) {
         await updateVenta(editId, data);
       } else {
@@ -52,6 +98,10 @@ const VentasPage: React.FC = () => {
         .then(setVentas)
         .catch(() => setError('No se pudieron cargar las ventas'))
         .finally(() => setLoading(false));
+      setDetalles([]);
+      setClienteId(null);
+      setNumeroFactura('');
+      setNotas('');
     } catch (err: any) {
       setFormError('Error al guardar venta');
     }
@@ -71,6 +121,8 @@ const VentasPage: React.FC = () => {
       .then(setVentas)
       .catch(() => setError('No se pudieron cargar las ventas'))
       .finally(() => setLoading(false));
+    getClientes().then(setClientes);
+    getProductos().then(setProductos);
   }, []);
 
   return (
@@ -84,13 +136,38 @@ const VentasPage: React.FC = () => {
           Aquí podrás ver, registrar y gestionar las ventas de tu empresa.
         </Typography>
         <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={() => handleOpen()}>Registrar venta</Button>
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
           <DialogTitle>{editId ? 'Editar venta' : 'Registrar venta'}</DialogTitle>
           <DialogContent>
-            <TextField margin="dense" label="Subtotal" name="subtotal" type="number" fullWidth value={form.subtotal} onChange={handleChange} />
+            <TextField select label="Cliente" name="cliente_id" fullWidth value={clienteId ?? ''} onChange={e => setClienteId(e.target.value ? Number(e.target.value) : null)} SelectProps={{ native: true }} margin="dense">
+              <option value="">Seleccionar cliente</option>
+              {clientes.map(cli => <option key={cli.id} value={cli.id}>{cli.nombre}</option>)}
+            </TextField>
+            <TextField margin="dense" label="N° Factura" name="numero_factura" fullWidth value={numeroFactura} onChange={e => setNumeroFactura(e.target.value)} />
+            <TextField margin="dense" label="Notas" name="notas" fullWidth value={notas} onChange={e => setNotas(e.target.value)} />
+            <Box mt={2} mb={2}>
+              <Typography variant="subtitle1">Productos</Typography>
+              {detalles.map((d, idx) => (
+                <Box key={idx} display="flex" alignItems="center" gap={1} mb={1}>
+                  <TextField select label="Producto" name="producto_id" value={d.producto_id} onChange={e => handleDetalleChange(idx, 'producto_id', e.target.value)} SelectProps={{ native: true }} sx={{ minWidth: 150 }}>
+                    <option value="">Seleccionar</option>
+                    {productos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                  </TextField>
+                  <TextField label="Cantidad" name="cantidad" type="number" value={d.cantidad} onChange={e => handleDetalleChange(idx, 'cantidad', e.target.value)} sx={{ width: 90 }} />
+                  <TextField label="Precio unitario" name="precio_unitario" type="number" value={d.precio_unitario} onChange={e => handleDetalleChange(idx, 'precio_unitario', e.target.value)} sx={{ width: 120 }} />
+                  <TextField label="Subtotal" name="subtotal" type="number" value={d.subtotal} InputProps={{ readOnly: true }} sx={{ width: 120 }} />
+                  <Button color="error" onClick={() => handleRemoveDetalle(idx)}>Eliminar</Button>
+                </Box>
+              ))}
+              <Button variant="outlined" onClick={handleAddDetalle}>Agregar producto</Button>
+            </Box>
             <TextField margin="dense" label="Descuento" name="descuento" type="number" fullWidth value={form.descuento} onChange={handleChange} />
-            <TextField margin="dense" label="Total" name="total" type="number" fullWidth value={form.total} onChange={handleChange} />
             <TextField margin="dense" label="Estado" name="estado" fullWidth value={form.estado} onChange={handleChange} />
+            <Box mt={2}>
+              <Typography variant="subtitle2">Subtotal: {calcularTotales().subtotal}</Typography>
+              <Typography variant="subtitle2">Descuento: {calcularTotales().descuento}</Typography>
+              <Typography variant="subtitle2">Total: {calcularTotales().total}</Typography>
+            </Box>
             {formError && <Alert severity="error">{formError}</Alert>}
           </DialogContent>
           <DialogActions>

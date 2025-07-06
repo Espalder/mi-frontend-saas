@@ -1,8 +1,15 @@
 import api from './api';
 
+export interface DetalleVenta {
+  producto_id: number;
+  cantidad: number;
+  precio_unitario: number;
+  subtotal: number;
+}
+
 export interface Venta {
-  id: number;
-  fecha: string;
+  id?: number;
+  fecha?: string;
   cliente_id?: number;
   usuario_id?: number;
   subtotal: number;
@@ -10,6 +17,9 @@ export interface Venta {
   total: number;
   estado: string;
   empresa_id?: number;
+  numero_factura?: string;
+  notas?: string;
+  detalles: DetalleVenta[];
 }
 
 export async function getVentas(): Promise<Venta[]> {
