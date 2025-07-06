@@ -4,7 +4,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import { getReporteGeneral, ReporteGeneral } from '../services/reportesService';
 import { useTheme } from '@mui/material/styles';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 import { getVentas, Venta } from '../services/ventasService';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
@@ -26,6 +26,7 @@ const ReportesPage: React.FC = () => {
   const handleDescargarPDF = () => {
     const doc = new jsPDF();
     doc.text('Reporte General', 10, 10);
+    // @ts-ignore
     doc.autoTable({
       head: [['ID', 'Fecha', 'Subtotal', 'Descuento', 'Total', 'Estado']],
       body: ventas.map(v => [v.id, v.fecha, v.subtotal, v.descuento, v.total, v.estado])
