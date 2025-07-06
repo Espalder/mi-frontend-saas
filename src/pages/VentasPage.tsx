@@ -31,7 +31,7 @@ const VentasPage: React.FC = () => {
     setOpen(true);
     setFormError('');
     if (venta) {
-      setEditId(venta.id);
+      setEditId(typeof venta.id === 'number' ? venta.id : null);
       setForm({ subtotal: venta.subtotal.toString(), descuento: venta.descuento.toString(), total: venta.total.toString(), estado: venta.estado });
     } else {
       setEditId(null);
