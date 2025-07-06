@@ -19,6 +19,7 @@ const ProductosPage: React.FC = () => {
     descripcion: '',
     precio: '',
     precio_compra: '',
+    precio_venta: '',
     stock: '',
     categoria_id: ''
   });
@@ -57,6 +58,7 @@ const ProductosPage: React.FC = () => {
         descripcion: form.descripcion,
         precio: parseFloat(form.precio),
         precio_compra: parseFloat(form.precio_compra),
+        precio_venta: form.precio_venta ? parseFloat(form.precio_venta) : parseFloat(form.precio),
         stock: parseInt(form.stock),
         stock_minimo: 0,
         categoria_id: parseInt(form.categoria_id),
@@ -92,6 +94,7 @@ const ProductosPage: React.FC = () => {
             <TextField margin="dense" label="Descripción" name="descripcion" fullWidth value={form.descripcion} onChange={handleChange} />
             <TextField margin="dense" label="Precio" name="precio" type="number" fullWidth value={form.precio} onChange={handleChange} />
             <TextField margin="dense" label="Precio compra" name="precio_compra" type="number" fullWidth value={form.precio_compra} onChange={handleChange} />
+            <TextField margin="dense" label="Precio venta" name="precio_venta" type="number" fullWidth value={form.precio_venta} onChange={handleChange} />
             <TextField margin="dense" label="Stock" name="stock" type="number" fullWidth value={form.stock} onChange={handleChange} />
             <TextField margin="dense" label="Categoría" name="categoria_id" select fullWidth value={form.categoria_id} onChange={handleChange} SelectProps={{ native: true }}>
               <option value="">Seleccione una categoría</option>
