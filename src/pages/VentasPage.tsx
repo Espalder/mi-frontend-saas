@@ -103,15 +103,15 @@ const VentasPage: React.FC = () => {
         await updateVenta(editId, data);
       } else {
         await createVenta({
-          cliente_id: form.cliente_id,
+          cliente_id: typeof clienteId === 'number' ? clienteId : undefined,
           usuario_id: user.id,
-          numero_factura: form.numero_factura,
+          numero_factura: numeroFactura,
           fecha: new Date().toISOString(),
           subtotal,
-          descuento: form.descuento || 0,
+          descuento: parseFloat(form.descuento) || 0,
           total,
           estado: form.estado,
-          notas: form.notas,
+          notas,
           detalles: detalles.map(d => ({ producto_id: d.producto_id, cantidad: d.cantidad, precio_unitario: d.precio_unitario, subtotal: d.cantidad * d.precio_unitario }))
         });
       }
@@ -160,7 +160,7 @@ const VentasPage: React.FC = () => {
 
   useEffect(() => {
     if (!editId) {
-      setForm(f => ({ ...f, numero_factura: getNextFactura() }));
+      setNumeroFactura(getNextFactura());
     }
   }, [ventas, editId]);
 
@@ -182,7 +182,7 @@ const VentasPage: React.FC = () => {
               <option value="">Seleccionar cliente</option>
               {clientes.map(cli => <option key={cli.id} value={cli.id}>{cli.nombre}</option>)}
             </TextField>
-            <TextField margin="dense" label="N° Factura" name="numero_factura" fullWidth value={form.numero_factura} onChange={handleChange} />
+            <TextField margin="dense" label="N° Factura" name="numero_factura" fullWidth value={numeroFactura} onChange={e => setNumeroFactura(e.target.value)} />
             <TextField margin="dense" label="Notas" name="notas" fullWidth value={notas} onChange={e => setNotas(e.target.value)} />
             <Box mt={2} mb={2}>
               <Typography variant="subtitle1">Productos</Typography>
