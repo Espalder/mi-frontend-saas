@@ -46,6 +46,10 @@ const ProductosPage: React.FC = () => {
   };
   const handleSubmit = async () => {
     if (!user) { setFormError('Usuario no autenticado'); return; }
+    if (!form.precio_compra || isNaN(parseFloat(form.precio_compra))) {
+      setFormError('El campo Precio compra es obligatorio y debe ser un número');
+      return;
+    }
     try {
       await createProducto({
         codigo: form.codigo,
