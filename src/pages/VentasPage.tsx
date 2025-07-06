@@ -93,7 +93,8 @@ const VentasPage: React.FC = () => {
         total,
         estado: form.estado,
         notas,
-        detalles: detallesLimpios
+        detalles: detallesLimpios,
+        empresa_id: (user && user.empresa_id) ? user.empresa_id : undefined
       };
       if (typeof clienteId === 'number') data.cliente_id = clienteId;
       if (editId) {
