@@ -52,6 +52,7 @@ const ProductosPage: React.FC = () => {
         descripcion: form.descripcion,
         precio: parseFloat(form.precio),
         stock: parseInt(form.stock),
+        stock_minimo: 0,
         categoria_id: parseInt(form.categoria_id),
         empresa_id: user.empresa_id
       });
