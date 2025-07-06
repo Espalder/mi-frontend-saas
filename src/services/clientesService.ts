@@ -4,6 +4,9 @@ export interface Cliente {
   id: number;
   nombre: string;
   empresa_id: number;
+  email?: string;
+  telefono?: string;
+  direccion?: string;
 }
 
 export async function getClientes(): Promise<Cliente[]> {

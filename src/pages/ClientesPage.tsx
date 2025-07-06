@@ -13,7 +13,7 @@ const ClientesPage: React.FC = () => {
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number|null>(null);
-  const [form, setForm] = useState({ nombre: '' });
+  const [form, setForm] = useState({ nombre: '', email: '', telefono: '', direccion: '' });
   const [formError, setFormError] = useState('');
   const theme = useTheme();
   const { user } = useAuth();
@@ -30,10 +30,10 @@ const ClientesPage: React.FC = () => {
     setFormError('');
     if (cli) {
       setEditId(cli.id);
-      setForm({ nombre: cli.nombre });
+      setForm({ nombre: cli.nombre, email: cli.email || '', telefono: cli.telefono || '', direccion: cli.direccion || '' });
     } else {
       setEditId(null);
-      setForm({ nombre: '' });
+      setForm({ nombre: '', email: '', telefono: '', direccion: '' });
     }
   };
   const handleClose = () => setOpen(false);
@@ -46,10 +46,17 @@ const ClientesPage: React.FC = () => {
         setFormError('Usuario no autenticado');
         return;
       }
+      const payload = {
+        nombre: form.nombre,
+        email: form.email || undefined,
+        telefono: form.telefono || undefined,
+        direccion: form.direccion || undefined,
+        empresa_id: user.empresa_id
+      };
       if (editId) {
-        await updateCliente(editId, form);
+        await updateCliente(editId, payload);
       } else {
-        await createCliente({ nombre: form.nombre, empresa_id: user.empresa_id });
+        await createCliente(payload);
       }
       setOpen(false);
       setLoading(true);
@@ -86,6 +93,9 @@ const ClientesPage: React.FC = () => {
           <DialogTitle>{editId ? 'Editar cliente' : 'Añadir cliente'}</DialogTitle>
           <DialogContent>
             <TextField margin="dense" label="Nombre" name="nombre" fullWidth value={form.nombre} onChange={handleChange} />
+            <TextField margin="dense" label="Email" name="email" fullWidth value={form.email} onChange={handleChange} />
+            <TextField margin="dense" label="Teléfono" name="telefono" fullWidth value={form.telefono} onChange={handleChange} />
+            <TextField margin="dense" label="Dirección" name="direccion" fullWidth value={form.direccion} onChange={handleChange} />
             {!user && <Alert severity="error">Usuario no autenticado</Alert>}
             {formError && user && <Alert severity="error">{formError}</Alert>}
           </DialogContent>
