@@ -194,7 +194,7 @@ const ProductosPage: React.FC = () => {
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : productos.length === 0 ? (
-          <Alert severity="info">No hay productos registrados.</Alert>
+          <Alert severity="info">No hay inventario registrado.</Alert>
         ) : (
           <TableContainer component={Paper} sx={{ bgcolor: 'background.paper' }}>
             <Table>

@@ -60,7 +60,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const getMenuItems = () => {
     const allMenuItems = [
       { text: 'Dashboard', icon: <BusinessOutlinedIcon />, path: '/dashboard' },
-      { text: 'Productos', icon: <Inventory2OutlinedIcon />, path: '/productos' },
+      { text: 'Inventario', icon: <Inventory2OutlinedIcon />, path: '/productos' },
       { text: 'Clientes', icon: <PeopleAltOutlinedIcon />, path: '/clientes', adminOnly: true },
       { text: 'Ventas', icon: <PointOfSaleOutlinedIcon />, path: '/ventas', adminOnly: true },
       { text: 'Usuarios', icon: <GroupOutlinedIcon />, path: '/usuarios', adminOnly: true },
