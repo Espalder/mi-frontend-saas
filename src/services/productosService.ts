@@ -6,6 +6,7 @@ export interface Producto {
   nombre: string;
   descripcion?: string;
   precio: number;
+  precio_compra: number;
   stock: number;
   stock_minimo: number;
   categoria_id?: number;
