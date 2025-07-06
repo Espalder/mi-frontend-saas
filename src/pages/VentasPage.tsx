@@ -206,7 +206,7 @@ const VentasPage: React.FC = () => {
                     <TableCell>{venta.estado}</TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => handleOpen(venta)}><EditIcon /></IconButton>
-                      <IconButton onClick={() => handleDelete(venta.id)}><DeleteIcon /></IconButton>
+                      <IconButton onClick={() => handleDelete(typeof venta.id === 'number' ? venta.id : 0)}><DeleteIcon /></IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
