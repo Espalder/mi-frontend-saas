@@ -42,6 +42,10 @@ const ClientesPage: React.FC = () => {
   };
   const handleSubmit = async () => {
     try {
+      if (!user) {
+        setFormError('Usuario no autenticado');
+        return;
+      }
       if (editId) {
         await updateCliente(editId, form);
       } else {
