@@ -71,6 +71,20 @@ const VentasPage: React.FC = () => {
   };
   const handleSubmit = async () => {
     try {
+      if (detalles.length === 0) {
+        setFormError('Debes agregar al menos un producto');
+        return;
+      }
+      const detallesLimpios = detalles.map(d => ({
+        producto_id: Number(d.producto_id),
+        cantidad: Number(d.cantidad),
+        precio_unitario: Number(d.precio_unitario),
+        subtotal: Number(d.subtotal)
+      }));
+      if (detallesLimpios.some(d => !d.producto_id || !d.cantidad || !d.precio_unitario)) {
+        setFormError('Todos los productos deben tener cantidad y precio');
+        return;
+      }
       const { subtotal, descuento, total } = calcularTotales();
       const data: any = {
         numero_factura: numeroFactura,
@@ -79,12 +93,7 @@ const VentasPage: React.FC = () => {
         total,
         estado: form.estado,
         notas,
-        detalles: detalles.map(d => ({
-          producto_id: parseInt(d.producto_id),
-          cantidad: parseInt(d.cantidad),
-          precio_unitario: parseFloat(d.precio_unitario),
-          subtotal: parseFloat(d.subtotal)
-        }))
+        detalles: detallesLimpios
       };
       if (typeof clienteId === 'number') data.cliente_id = clienteId;
       if (editId) {
