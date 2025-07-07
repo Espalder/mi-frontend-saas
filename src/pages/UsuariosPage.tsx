@@ -126,9 +126,6 @@ const UsuariosPage: React.FC = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" minHeight="80vh" bgcolor={theme => theme.palette.background.default} p={4}>
-      <Typography variant="h2" color="primary" sx={{ mb: 4, fontWeight: 'bold', textAlign: 'center', background: '#fffbe6', borderRadius: 2, p: 2 }}>
-        USUARIOS FUNCIONA
-      </Typography>
       <Paper elevation={3} sx={{ p: 4, minWidth: 350, bgcolor: 'background.paper', mb: 3, width: '100%', maxWidth: 900 }}>
         <Box display="flex" alignItems="center" mb={2}>
           <GroupOutlinedIcon color="primary" sx={{ fontSize: 40, mr: 1 }} />
