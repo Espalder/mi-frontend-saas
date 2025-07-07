@@ -5,6 +5,10 @@ const API_URL = (process.env.REACT_APP_API_URL || 'https://mi-backend-saas.onren
 export interface LoginResponse {
   access_token: string;
   token_type: string;
+  user_id: number;
+  username: string;
+  rol: string;
+  empresa_id: number;
 }
 
 export async function login(username: string, password: string): Promise<LoginResponse> {

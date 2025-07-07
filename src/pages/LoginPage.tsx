@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, TextField, Box, Typography, Paper, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { login, saveToken } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -9,6 +10,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,6 +19,13 @@ const LoginPage: React.FC = () => {
     try {
       const data = await login(username, password);
       saveToken(data.access_token);
+      // Guarda el usuario en el contexto y localStorage
+      authLogin({
+        id: data.user_id,
+        username: data.username,
+        rol: data.rol,
+        empresa_id: data.empresa_id
+      });
       navigate('/dashboard');
     } catch (err: any) {
       setError('Usuario o contraseña incorrectos');
