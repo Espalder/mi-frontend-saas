@@ -110,7 +110,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const drawer = (
     <Box>
-      <Box display="flex" flexDirection="column" alignItems="center" p={2}>
+      <Box display="flex" flexDirection="column" alignItems="center" p={2} mt={4}>
         <Box position="relative" mb={1} display="flex" justifyContent="center" alignItems="center" width="100%">
           <Avatar
             src={logoSrc}
@@ -122,7 +122,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <EditIcon fontSize="small" />
           </IconButton>
         </Box>
-        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: theme.palette.text.primary, textAlign: 'center' }}>Mi Empresa</Typography>
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, color: theme.palette.text.primary, textAlign: 'center' }}>Mi Empresa</Typography>
         {user && (
           <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textAlign: 'center' }}>
             {user.nombre} ({user.rol})
@@ -224,6 +224,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         justifyContent: 'flex-start',
         transition: 'width 0.3s',
         overflowY: 'auto',
+        height: '100vh',
       }}>
         <Toolbar />
         <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto' }}>
