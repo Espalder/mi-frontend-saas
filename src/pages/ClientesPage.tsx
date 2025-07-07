@@ -50,8 +50,7 @@ const ClientesPage: React.FC = () => {
         nombre: form.nombre,
         email: form.email || undefined,
         telefono: form.telefono || undefined,
-        direccion: form.direccion || undefined,
-        empresa_id: user.empresa_id
+        direccion: form.direccion || undefined
       };
       if (editId) {
         await updateCliente(editId, payload);
