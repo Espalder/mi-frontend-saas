@@ -13,7 +13,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { removeToken } from '../services/authService';
 import api from '../services/api';
 
-const drawerWidth = 220;
+const drawerWidth = 260;
 
 interface User {
   id: number;
@@ -35,6 +35,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const [logoModalOpen, setLogoModalOpen] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(true); // Controla el Drawer en desktop
 
   useEffect(() => {
     api.get('usuarios/me')
@@ -57,7 +58,10 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     },
   });
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+    setDrawerOpen(!drawerOpen);
+  };
   const handleLogout = () => {
     removeToken();
     navigate('/login');
@@ -102,17 +106,19 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   };
 
+  const logoSrc = logoPreview || process.env.PUBLIC_URL + '/Logo-Project.png';
+
   const drawer = (
     <Box>
       <Box display="flex" flexDirection="column" alignItems="center" p={2}>
-        <Box position="relative" mb={1}>
+        <Box position="relative" mb={1} display="flex" justifyContent="center" alignItems="center" width="100%">
           <Avatar
-            src={logoPreview || process.env.PUBLIC_URL + '/logo_empresa.png'}
+            src={logoSrc}
             alt="Logo Empresa"
-            sx={{ width: 90, height: 90, mb: 1, bgcolor: theme.palette.background.paper, boxShadow: 2, cursor: 'pointer' }}
+            sx={{ width: 120, height: 120, mb: 1, bgcolor: theme.palette.background.paper, boxShadow: 2, cursor: 'pointer', border: '4px solid #fff' }}
             onClick={() => setLogoModalOpen(true)}
           />
-          <IconButton size="small" sx={{ position: 'absolute', bottom: 8, right: 8, bgcolor: '#fff', boxShadow: 1 }} onClick={() => setLogoModalOpen(true)}>
+          <IconButton size="small" sx={{ position: 'absolute', bottom: 16, right: 32, bgcolor: '#fff', boxShadow: 1 }} onClick={() => setLogoModalOpen(true)}>
             <EditIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -177,18 +183,25 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           }} color="default" />
         </Toolbar>
       </AppBar>
+      {/* Drawer permanente en desktop, ocultable */}
       <Drawer
-        variant="permanent"
+        variant="persistent"
+        open={drawerOpen}
         sx={{
-          width: drawerWidth,
+          width: drawerOpen ? drawerWidth : 0,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            display: drawerOpen ? 'block' : 'none',
+            transition: 'width 0.3s',
+          },
           display: { xs: 'none', sm: 'block' },
         }}
-        open
       >
         {drawer}
       </Drawer>
+      {/* Drawer temporal en mobile */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -198,17 +211,17 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       >
         {drawer}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, minHeight: '100vh', bgcolor: theme.palette.background.default, background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%' }, minHeight: '100vh', bgcolor: theme.palette.background.default, background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', transition: 'width 0.3s' }}>
         <Toolbar />
-        <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto' }}>
+        <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto', overflowY: 'auto' }}>
           {children}
         </Box>
       </Box>
       {/* Modal para editar logo */}
       <Modal open={logoModalOpen} onClose={() => setLogoModalOpen(false)}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 4, borderRadius: 2, boxShadow: 24, minWidth: 320 }}>
-          <Typography variant="h6" mb={2}>Editar logo de la empresa</Typography>
-          <Avatar src={logoPreview || process.env.PUBLIC_URL + '/logo_empresa.png'} sx={{ width: 120, height: 120, mx: 'auto', mb: 2 }} />
+          <Typography variant="h6" mb={2}>Editar logotipo de la empresa</Typography>
+          <Avatar src={logoPreview || process.env.PUBLIC_URL + '/Logo-Project.png'} sx={{ width: 120, height: 120, mx: 'auto', mb: 2 }} />
           <Button variant="contained" component="label" fullWidth>
             Subir nueva imagen
             <input type="file" accept="image/*" hidden onChange={handleLogoChange} />
