@@ -31,6 +31,12 @@ const EmpresaPage: React.FC = () => {
         ) : empresa ? (
           <Box>
             <Typography variant="h6" color="text.primary">{empresa.nombre}</Typography>
+            <Typography variant="body1" color="text.secondary">Código: {empresa.codigo_empresa}</Typography>
+            {empresa.descripcion && <Typography variant="body1" color="text.secondary">Descripción: {empresa.descripcion}</Typography>}
+            {empresa.plan_suscripcion && <Typography variant="body1" color="text.secondary">Plan: {empresa.plan_suscripcion}</Typography>}
+            {empresa.fecha_creacion && <Typography variant="body1" color="text.secondary">Fecha de creación: {new Date(empresa.fecha_creacion).toLocaleString()}</Typography>}
+            {empresa.fecha_actualizacion && <Typography variant="body1" color="text.secondary">Última actualización: {new Date(empresa.fecha_actualizacion).toLocaleString()}</Typography>}
+            <Typography variant="body1" color="text.secondary">Estado: {empresa.activo ? 'Activa' : 'Inactiva'}</Typography>
             {empresa.ruc && <Typography variant="body1" color="text.secondary">RUC: {empresa.ruc}</Typography>}
             {empresa.direccion && <Typography variant="body1" color="text.secondary">Dirección: {empresa.direccion}</Typography>}
             {empresa.telefono && <Typography variant="body1" color="text.secondary">Teléfono: {empresa.telefono}</Typography>}

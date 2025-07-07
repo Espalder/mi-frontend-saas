@@ -3,6 +3,12 @@ import api from './api';
 export interface Empresa {
   id: number;
   nombre: string;
+  codigo_empresa: string;
+  descripcion?: string;
+  plan_suscripcion?: string;
+  fecha_creacion?: string;
+  fecha_actualizacion?: string | null;
+  activo?: boolean;
   direccion?: string;
   telefono?: string;
   email?: string;
