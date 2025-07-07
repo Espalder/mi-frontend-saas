@@ -44,8 +44,12 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       mode: darkMode ? 'dark' : 'light',
       primary: { main: '#1976d2' },
       background: {
-        default: darkMode ? '#23272f' : '#e6f3ff',
+        default: darkMode ? '#23272f' : 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)',
         paper: darkMode ? '#2c313a' : '#f9fafc',
+      },
+      text: {
+        primary: darkMode ? '#fff' : '#222e3a',
+        secondary: darkMode ? '#b0b8c1' : '#4b5563',
       },
     },
   });
@@ -122,48 +126,59 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
-        <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }} color="primary">
-          <Toolbar>
-            <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: 'none' } }}>
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-              Sistema de Gestión Empresarial
-            </Typography>
-            <Switch checked={darkMode} onChange={() => {
-              setDarkMode((prev: boolean) => {
-                localStorage.setItem('darkMode', JSON.stringify(!prev));
-                return !prev;
-              });
-            }} color="default" />
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-            display: { xs: 'none', sm: 'block' },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
-          sx={{ display: { xs: 'block', sm: 'none' }, [`& .MuiDrawer-paper`]: { width: drawerWidth } }}
-        >
-          {drawer}
-        </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, minHeight: '100vh', bgcolor: theme.palette.background.default }}>
-          <Toolbar />
-          {children}
-        </Box>
+      <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }} color="primary">
+        <Toolbar sx={{ position: 'relative', minHeight: 80 }}>
+          {/* Banner decorativo en la cabecera */}
+          {!darkMode && (
+            <Box sx={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%',
+              background: 'url("/banner_bg.png") center/cover no-repeat',
+              opacity: 0.12,
+              zIndex: 0,
+            }} />
+          )}
+          <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: 'none' }, zIndex: 1 }}>
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap sx={{ flexGrow: 1, zIndex: 1 }}>
+            Sistema de Gestión Empresarial
+          </Typography>
+          <Switch checked={darkMode} onChange={() => {
+            setDarkMode((prev: boolean) => {
+              localStorage.setItem('darkMode', JSON.stringify(!prev));
+              return !prev;
+            });
+          }} color="default" />
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          display: { xs: 'none', sm: 'block' },
+        }}
+        open
+      >
+        {drawer}
+      </Drawer>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: 'block', sm: 'none' }, [`& .MuiDrawer-paper`]: { width: drawerWidth } }}
+      >
+        {drawer}
+      </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, minHeight: '100vh', bgcolor: theme.palette.background.default, background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined }}>
+        <Toolbar />
+        {children}
       </Box>
     </ThemeProvider>
   );
