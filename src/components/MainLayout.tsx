@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, useTheme, ThemeProvider, createTheme, Avatar, ListItemButton } from '@mui/material';
+import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Switch, useTheme, ThemeProvider, createTheme, Avatar, ListItemButton, Modal, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import EditIcon from '@mui/icons-material/Edit';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import PointOfSaleOutlinedIcon from '@mui/icons-material/PointOfSaleOutlined';
@@ -32,6 +33,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [logoModalOpen, setLogoModalOpen] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   useEffect(() => {
     api.get('usuarios/me')
@@ -90,13 +93,32 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const menuItems = getMenuItems();
 
+  // Modal para editar logo (solo frontend, sin lógica backend)
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => setLogoPreview(ev.target?.result as string);
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
   const drawer = (
     <Box>
       <Box display="flex" flexDirection="column" alignItems="center" p={2}>
-        <Avatar src={process.env.PUBLIC_URL + '/logo_empresa.png'} alt="Logo Empresa" sx={{ width: 64, height: 64, mb: 2, bgcolor: theme.palette.background.paper, boxShadow: 2 }} />
-        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: theme.palette.text.primary }}>Mi Empresa</Typography>
+        <Box position="relative" mb={1}>
+          <Avatar
+            src={logoPreview || process.env.PUBLIC_URL + '/logo_empresa.png'}
+            alt="Logo Empresa"
+            sx={{ width: 90, height: 90, mb: 1, bgcolor: theme.palette.background.paper, boxShadow: 2, cursor: 'pointer' }}
+            onClick={() => setLogoModalOpen(true)}
+          />
+          <IconButton size="small" sx={{ position: 'absolute', bottom: 8, right: 8, bgcolor: '#fff', boxShadow: 1 }} onClick={() => setLogoModalOpen(true)}>
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </Box>
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: theme.palette.text.primary, textAlign: 'center' }}>Mi Empresa</Typography>
         {user && (
-          <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+          <Typography variant="caption" sx={{ color: theme.palette.text.secondary, textAlign: 'center' }}>
             {user.nombre} ({user.rol})
           </Typography>
         )}
@@ -141,7 +163,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               zIndex: 0,
             }} />
           )}
-          <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: 'none' }, zIndex: 1 }}>
+          <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, zIndex: 1 }}>
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1, zIndex: 1 }}>
@@ -176,10 +198,24 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       >
         {drawer}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, minHeight: '100vh', bgcolor: theme.palette.background.default, background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, minHeight: '100vh', bgcolor: theme.palette.background.default, background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
         <Toolbar />
-        {children}
+        <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto' }}>
+          {children}
+        </Box>
       </Box>
+      {/* Modal para editar logo */}
+      <Modal open={logoModalOpen} onClose={() => setLogoModalOpen(false)}>
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 4, borderRadius: 2, boxShadow: 24, minWidth: 320 }}>
+          <Typography variant="h6" mb={2}>Editar logo de la empresa</Typography>
+          <Avatar src={logoPreview || process.env.PUBLIC_URL + '/logo_empresa.png'} sx={{ width: 120, height: 120, mx: 'auto', mb: 2 }} />
+          <Button variant="contained" component="label" fullWidth>
+            Subir nueva imagen
+            <input type="file" accept="image/*" hidden onChange={handleLogoChange} />
+          </Button>
+          <Button onClick={() => setLogoModalOpen(false)} sx={{ mt: 2 }} fullWidth>Cerrar</Button>
+        </Box>
+      </Modal>
     </ThemeProvider>
   );
 };
