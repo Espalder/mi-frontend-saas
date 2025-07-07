@@ -110,12 +110,12 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const drawer = (
     <Box>
-      <Box display="flex" flexDirection="column" alignItems="center" p={2} mt={4}>
+      <Box display="flex" flexDirection="column" alignItems="center" p={2} mt={10}>
         <Box position="relative" mb={1} display="flex" justifyContent="center" alignItems="center" width="100%">
           <Avatar
             src={logoSrc}
             alt="Logo Empresa"
-            sx={{ width: 120, height: 120, mb: 1, bgcolor: theme.palette.background.paper, boxShadow: 2, cursor: 'pointer', border: '4px solid #fff' }}
+            sx={{ width: 150, height: 150, mb: 1, bgcolor: theme.palette.background.paper, boxShadow: 2, cursor: 'pointer', border: '4px solid #fff' }}
             onClick={() => setLogoModalOpen(true)}
           />
           <IconButton size="small" sx={{ position: 'absolute', bottom: 16, right: 32, bgcolor: '#fff', boxShadow: 1 }} onClick={() => setLogoModalOpen(true)}>
@@ -223,7 +223,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         alignItems: 'center',
         justifyContent: 'flex-start',
         transition: 'width 0.3s',
-        overflowY: 'auto',
+        overflowY: 'scroll',
         height: '100vh',
       }}>
         <Toolbar />
