@@ -211,9 +211,22 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       >
         {drawer}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%' }, minHeight: '100vh', bgcolor: theme.palette.background.default, background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', transition: 'width 0.3s' }}>
+      <Box component="main" sx={{
+        flexGrow: 1,
+        p: 3,
+        width: '100%',
+        minHeight: '100vh',
+        bgcolor: theme.palette.background.default,
+        background: !darkMode ? 'linear-gradient(135deg, #e6f3ff 0%, #f4f6fa 100%)' : undefined,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        transition: 'width 0.3s',
+        overflowY: 'auto',
+      }}>
         <Toolbar />
-        <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto', overflowY: 'auto' }}>
+        <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto' }}>
           {children}
         </Box>
       </Box>
