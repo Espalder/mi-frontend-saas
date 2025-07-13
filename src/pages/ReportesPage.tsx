@@ -13,8 +13,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
 import { getVentasPorDia, getVentasPorCategoria } from '../services/reportesService';
 import { Bar, Pie } from 'react-chartjs-2';
 import {
@@ -27,6 +25,12 @@ import {
   Legend,
   ArcElement
 } from 'chart.js';
+
+// Configurar dayjs plugins después de todos los imports
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+
+// Registrar Chart.js después de todos los imports
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const ReportesPage: React.FC = () => {
