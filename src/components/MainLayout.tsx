@@ -154,7 +154,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }} color="primary">
+        <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }} color="primary">
         <Toolbar sx={{ position: 'relative', minHeight: 80 }}>
           {/* Banner decorativo en la cabecera */}
           {!darkMode && (
@@ -170,24 +170,24 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             }} />
           )}
           <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, zIndex: 1 }}>
-            <MenuIcon />
-          </IconButton>
+              <MenuIcon />
+            </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1, zIndex: 1 }}>
-            Sistema de Gestión Empresarial
-          </Typography>
-          <Switch checked={darkMode} onChange={() => {
-            setDarkMode((prev: boolean) => {
-              localStorage.setItem('darkMode', JSON.stringify(!prev));
-              return !prev;
-            });
-          }} color="default" />
-        </Toolbar>
-      </AppBar>
+              Sistema de Gestión Empresarial
+            </Typography>
+            <Switch checked={darkMode} onChange={() => {
+              setDarkMode((prev: boolean) => {
+                localStorage.setItem('darkMode', JSON.stringify(!prev));
+                return !prev;
+              });
+            }} color="default" />
+          </Toolbar>
+        </AppBar>
       {/* Drawer permanente en desktop, ocultable */}
-      <Drawer
+        <Drawer
         variant="persistent"
         open={drawerOpen}
-        sx={{
+          sx={{
           width: drawerOpen ? drawerWidth : 0,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
@@ -196,21 +196,21 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             display: drawerOpen ? 'block' : 'none',
             transition: 'width 0.3s',
           },
-          display: { xs: 'none', sm: 'block' },
-        }}
-      >
-        {drawer}
-      </Drawer>
+            display: { xs: 'none', sm: 'block' },
+          }}
+        >
+          {drawer}
+        </Drawer>
       {/* Drawer temporal en mobile */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
-        sx={{ display: { xs: 'block', sm: 'none' }, [`& .MuiDrawer-paper`]: { width: drawerWidth } }}
-      >
-        {drawer}
-      </Drawer>
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{ display: { xs: 'block', sm: 'none' }, [`& .MuiDrawer-paper`]: { width: drawerWidth } }}
+        >
+          {drawer}
+        </Drawer>
       <Box component="main" sx={{
         flexGrow: 1,
         p: 3,
@@ -226,7 +226,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         overflowY: 'scroll',
         height: '100vh',
       }}>
-        <Toolbar />
+          <Toolbar />
         <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto' }}>
           {children}
         </Box>
