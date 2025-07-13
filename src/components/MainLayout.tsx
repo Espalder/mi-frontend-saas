@@ -86,9 +86,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       return allMenuItems.filter(item => !item.adminOnly);
     }
 
-    // Si es vendedor, mostrar dashboard, productos y ventas
+    // Si es vendedor, mostrar dashboard, productos, ventas, clientes y reportes
     if (user.rol === 'vendedor') {
-      return allMenuItems.filter(item => !item.adminOnly || item.text === 'Ventas');
+      return allMenuItems.filter(item =>
+        !item.adminOnly ||
+        item.text === 'Ventas' ||
+        item.text === 'Clientes' ||
+        item.text === 'Reportes'
+      );
     }
 
     // Si es admin, mostrar todo
