@@ -11,6 +11,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs, { Dayjs } from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 import { getVentasPorDia, getVentasPorCategoria } from '../services/reportesService';
 import { Bar, Pie } from 'react-chartjs-2';
 import {
@@ -49,7 +53,7 @@ const ReportesPage: React.FC = () => {
   // Filtrar ventas por fechaInicio y fechaFin
   const ventasFiltradas = ventas.filter(v => {
     const fecha = dayjs(v.fecha);
-    return (!fechaInicio || fecha.isAfter(fechaInicio.subtract(1, 'day'))) && (!fechaFin || fecha.isBefore(fechaFin.add(1, 'day')));
+    return (!fechaInicio || fecha.isSameOrAfter(fechaInicio, 'day')) && (!fechaFin || fecha.isSameOrBefore(fechaFin, 'day'));
   });
 
   // Obtener datos para gráficos cuando cambian fechas
