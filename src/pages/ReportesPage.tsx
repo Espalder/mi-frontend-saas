@@ -55,8 +55,9 @@ const ReportesPage: React.FC = () => {
   // Obtener datos para gráficos cuando cambian fechas
   useEffect(() => {
     if (fechaInicio && fechaFin) {
-      const fi = fechaInicio.format('YYYY-MM-DD');
-      const ff = fechaFin.format('YYYY-MM-DD');
+      // Enviar fechas con hora para rango exacto
+      const fi = fechaInicio.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+      const ff = fechaFin.endOf('day').format('YYYY-MM-DDTHH:mm:ss');
       getVentasPorDia(fi, ff).then(setDatosBarras);
       getVentasPorCategoria(fi, ff).then(setDatosTorta);
     }

@@ -96,7 +96,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/clientes"
           element={
-            <PrivateRoute requiredRole="admin">
+            <PrivateRoute>
               <MainLayout>
                 <ClientesPage />
               </MainLayout>
@@ -136,7 +136,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/reportes"
           element={
-            <PrivateRoute requiredRole="admin">
+            <PrivateRoute>
               <MainLayout>
                 <ReportesPage />
               </MainLayout>
